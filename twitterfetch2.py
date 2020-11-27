@@ -14,22 +14,21 @@ auth.set_access_token(access_token, access_token_secret)
 
 api = tweepy.API(auth, wait_on_rate_limit=True)
 
-results = tweepy.Cursor(api.search, q='TXT', tweet_mode='extended')
-print(results)
-
 def fetch_tweets(query):
     tweets = []
     ids = []
-    results = tweepy.Cursor(api.search, q=query, tweet_mode='extended').items()
-    print(results)
-    while len(ids) < 100:
-        for status in results:
-            id = status.user_id
+    results = tweepy.Cursor(api.search, q=query+'-filter:retweets', lang='fr').items(300)
+    for status in results:
+        while len(ids) < 100:
+            id = status.user.id
             ids.append(id)
+            print(len(ids))
+    
     for id in ids:
-        statuses = tweepy.Cursor(api.user_timeline, user_id=id).items()
-        tweet = statuses.full_text
-        tweets.append(tweet)
+        statuses = tweepy.Cursor(api.user_timeline, user_id=id, tweet_mode='extended', include_rts=False).items(20)
+        for status in statuses:
+            tweet = status.full_text
+            tweets.append(tweet)
     return tweets
 
-
+print(fetch_tweets('TXT'))
