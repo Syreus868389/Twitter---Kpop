@@ -2,6 +2,7 @@ import tweepy
 import pandas as pd
 import csv
 import time
+from collections import Counter
 
 consumer_key="x5ER0kkhEvbS8cJg8jDF2Z04T"
 consumer_secret="6WSZoraAH8CIMqkijT04OkdFSQ42LvoRSp7FFPmNTKT0h26fSR"
@@ -18,11 +19,12 @@ def fetch_tweets(query):
     tweets = []
     ids = []
     results = tweepy.Cursor(api.search, q=query+'-filter:retweets', lang='fr').items(300)
-    for status in results:
-        while len(ids) < 100:
+    while len(ids) < 100:
+        for status in results:
             id = status.user.id
             ids.append(id)
             print(len(ids))
+            print(ids)
     
     for id in ids:
         statuses = tweepy.Cursor(api.user_timeline, user_id=id, tweet_mode='extended', include_rts=False).items(20)
@@ -31,4 +33,6 @@ def fetch_tweets(query):
             tweets.append(tweet)
     return tweets
 
-print(fetch_tweets('TXT'))
+TXTtweets = fetch_tweets('TXT')
+
+
