@@ -8,11 +8,13 @@ from nltk.corpus import stopwords
 import numpy as np
 from PIL import Image 
 import matplotlib 
-matplotlib.use('AGG')
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 
 stop_words = set(stopwords.words('french'))
+mots_stop = ['les','à','a']
+
 
 d = getcwd()
 image = Image.open(path.join(d, "Twitter-Logo.png"))
@@ -29,7 +31,7 @@ auth.set_access_token(access_token, access_token_secret)
 
 api = tweepy.API(auth, wait_on_rate_limit=True)
 
-def fetch_tweets(query):
+def get_tweet_frequency(query):
     ids = []
     tweet_corpus = []
     results = tweepy.Cursor(api.search, q=query+'-filter:retweets', lang='fr').items(300)
@@ -47,7 +49,7 @@ def fetch_tweets(query):
             tweet = status.full_text
             tweet_words = tweet.split(" ")
             for word in tweet_words:
-                if word not in stop_words:
+                if word not in stop_words and word not in mots_stop:
                     tweet_corpus.append(word)
     tweet_count = Counter(tweet_corpus)
     
@@ -57,7 +59,7 @@ def fetch_tweets(query):
     
     delete_keys = []
     for key,value in tweet_count.items():
-        if value < 10:
+        if value < 15:
            delete_keys.append(key)
         else:
             continue
@@ -65,11 +67,14 @@ def fetch_tweets(query):
         tweet_count.pop(key)
     
     wordcloud = WordCloud(background_color="white", max_words=200, mask=mask).generate_from_frequencies(tweet_count)
-    plt.imshow(wordcloud, interpolation="bilinear")
+    plt.imshow(wordcloud, interpolation="nearest")
     plt.axis("off")
-    plt.savefig(query + '.png')
+    plt.savefig(query + '.png', transparent=True)
     
-fetch_tweets('TXT')  
+artist_list = ['TXT','NCT U','MAMAMOO','Stray Kids','EVERGLOW','ITZY','Smino','Damso','Naza','Charli XCX','Oh Wonder','KAYTRANADA']
+    
+for artist in artist_list:
+    get_tweet_frequency(artist)
             
 
 
