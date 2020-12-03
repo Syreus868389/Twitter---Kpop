@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 
 stop_words = set(stopwords.words('french'))
-mots_stop = ['les','à','a']
+mots_stop = ['les','à','a','ça','le','la']
 
 
 d = getcwd()
